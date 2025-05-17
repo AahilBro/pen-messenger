@@ -19,8 +19,9 @@
 
   <!-- PEN NAME & PASSWORD SCREEN -->
   <section id="penId-section" class="screen">
-    <input id="penIdInput" placeholder="Enter your Pen Name" />
-    <input id="sitePasswordInput" type="password" placeholder="Enter Site Password" />
+    <h2>Enter Your Pen Name & Site Password</h2>
+    <input id="penIdInput" placeholder="Pen Name" autocomplete="off" />
+    <input id="sitePasswordInput" type="password" placeholder="Site Password" autocomplete="off" />
     <button id="penIdSubmitBtn" class="glow-button">Enter Chat</button>
     <p id="penIdError" class="error-text"></p>
   </section>
@@ -28,15 +29,17 @@
   <!-- CHAT SCREEN -->
   <section id="chat-section" class="screen">
     <div id="chat-container">
-      <div id="dm-list" class="chat-panel">
+      <aside id="dm-list" class="chat-panel">
         <h2>DMs</h2>
         <div id="messages"></div>
-      </div>
-      <div id="pen-group" class="chat-panel">
+      </aside>
+
+      <main id="pen-group" class="chat-panel">
         <h2>Pen Group</h2>
-        <!-- Could add group chat or members here -->
-      </div>
+        <!-- Add group chat or members later -->
+      </main>
     </div>
+
     <div id="message-box">
       <input id="messageInput" placeholder="Type a message..." autocomplete="off" />
       <button id="sendMessageBtn" class="glow-button">Send</button>
