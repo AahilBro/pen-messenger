@@ -51,6 +51,18 @@ function createPenBadge(penName) {
   return badge;
 }
 
+// Format Firestore timestamp to human-readable time like "3:45 PM"
+function formatTimestamp(timestamp) {
+  if (!timestamp) return '';
+  const date = timestamp.toDate();
+  let hours = date.getHours();
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  return `${hours}:${minutes} ${ampm}`;
+}
+
 // Show only the given section and hide others
 function showSection(section) {
   [loginSection, penIdSection, chatSection].forEach(s => {
@@ -202,6 +214,14 @@ function listenUserMessages() {
         textSpan.textContent = `${msg.penName}: ${msg.text}`;
         msgDiv.appendChild(textSpan);
 
+        // Timestamp below message in small light text
+        const timeSpan = document.createElement('div');
+        timeSpan.style.fontSize = '0.7em';
+        timeSpan.style.color = '#999';
+        timeSpan.style.clear = 'both';
+        timeSpan.textContent = formatTimestamp(msg.timestamp);
+        msgDiv.appendChild(timeSpan);
+
         dmMessagesDiv.appendChild(msgDiv);
       });
       dmMessagesDiv.scrollTop = dmMessagesDiv.scrollHeight;
@@ -229,6 +249,14 @@ function listenGroupMessages() {
         const textSpan = document.createElement('span');
         textSpan.textContent = `${msg.penName}: ${msg.text}`;
         msgDiv.appendChild(textSpan);
+
+        // Timestamp below message in small light text
+        const timeSpan = document.createElement('div');
+        timeSpan.style.fontSize = '0.7em';
+        timeSpan.style.color = '#999';
+        timeSpan.style.clear = 'both';
+        timeSpan.textContent = formatTimestamp(msg.timestamp);
+        msgDiv.appendChild(timeSpan);
 
         groupMessagesDiv.appendChild(msgDiv);
       });
