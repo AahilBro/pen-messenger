@@ -34,15 +34,15 @@ const groupMessageInput = document.getElementById('groupMessageInput');
 const sendGroupMessageBtn = document.getElementById('sendGroupMessageBtn');
 
 const changePenNameBtn = document.getElementById('changePenNameBtn');
+const logoutBtn = document.getElementById('logoutBtn'); // optional logout button
 
 // Globals
 let currentUser = null;
 let currentPenName = null;
-const SITE_PASSWORD = "ink";  // change to your real password!
+const SITE_PASSWORD = "ink";  // change this to your real password!
 
 // --- Helper functions ---
 
-// Create badge element with initials from penName
 function createPenBadge(penName) {
   const badge = document.createElement('div');
   badge.classList.add('pen-badge');
@@ -51,7 +51,6 @@ function createPenBadge(penName) {
   return badge;
 }
 
-// Format Firestore timestamp to human-readable time like "3:45 PM"
 function formatTimestamp(timestamp) {
   if (!timestamp) return '';
   const date = timestamp.toDate();
@@ -59,11 +58,10 @@ function formatTimestamp(timestamp) {
   const minutes = date.getMinutes().toString().padStart(2, '0');
   const ampm = hours >= 12 ? 'PM' : 'AM';
   hours = hours % 12;
-  hours = hours ? hours : 12; // the hour '0' should be '12'
+  hours = hours ? hours : 12;
   return `${hours}:${minutes} ${ampm}`;
 }
 
-// Show only the given section and hide others
 function showSection(section) {
   [loginSection, penIdSection, chatSection].forEach(s => {
     s.classList.remove('active');
@@ -71,12 +69,11 @@ function showSection(section) {
   section.classList.add('active');
 }
 
-// Clear children of an element
 function clearElement(el) {
   while (el.firstChild) el.removeChild(el.firstChild);
 }
 
-// --- Auth & Login ---
+// --- Authentication ---
 
 googleSignInBtn.onclick = async () => {
   try {
@@ -90,7 +87,6 @@ googleSignInBtn.onclick = async () => {
 auth.onAuthStateChanged(user => {
   if (user) {
     currentUser = user;
-    // Proceed to penName + password screen
     showSection(penIdSection);
   } else {
     currentUser = null;
@@ -99,7 +95,8 @@ auth.onAuthStateChanged(user => {
   }
 });
 
-// PenName + site password submission
+// --- PenName + site password ---
+
 penIdSubmitBtn.onclick = () => {
   penIdError.textContent = "";
   const pen = penIdInput.value.trim();
@@ -115,7 +112,6 @@ penIdSubmitBtn.onclick = () => {
   }
 
   currentPenName = pen;
-  // Save user penName to Firestore
   db.collection('users').doc(currentUser.uid).set({
     penName: currentPenName,
     lastActive: firebase.firestore.FieldValue.serverTimestamp()
@@ -132,7 +128,6 @@ penIdSubmitBtn.onclick = () => {
   });
 };
 
-// Change PenName button (logs out and restarts)
 changePenNameBtn.onclick = () => {
   if (confirm("Change Pen Name? This will log you out.")) {
     auth.signOut();
@@ -140,7 +135,15 @@ changePenNameBtn.onclick = () => {
   }
 };
 
+// Optional logout button
+if (logoutBtn) {
+  logoutBtn.onclick = () => {
+    auth.signOut();
+  };
+}
+
 // --- Presence update ---
+
 function updatePresence() {
   if (!currentUser) return;
   const userRef = db.collection('users').doc(currentUser.uid);
@@ -148,14 +151,12 @@ function updatePresence() {
   userRef.update({
     lastActive: firebase.firestore.FieldValue.serverTimestamp()
   }).catch(() => {
-    // User doc might not exist yet, create it
     userRef.set({
       penName: currentPenName,
       lastActive: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
   });
 
-  // Update presence every 30 seconds
   setInterval(() => {
     userRef.update({
       lastActive: firebase.firestore.FieldValue.serverTimestamp()
@@ -163,7 +164,8 @@ function updatePresence() {
   }, 30000);
 }
 
-// --- Load & display members ---
+// --- Load members ---
+
 function loadMembers() {
   db.collection('users')
     .orderBy('penName')
@@ -172,7 +174,6 @@ function loadMembers() {
       snapshot.forEach(doc => {
         const user = doc.data();
         if (!user.penName) return;
-        // Check lastActive for "online" status (within last 2 min)
         const lastActive = user.lastActive?.toDate() || new Date(0);
         const isOnline = (new Date() - lastActive) < 2 * 60 * 1000;
 
@@ -192,7 +193,8 @@ function loadMembers() {
     });
 }
 
-// --- Listen to DM messages (simple implementation: show messages from all users as a feed) ---
+// --- Listen for DM messages (all DMs visible for now) ---
+
 function listenUserMessages() {
   db.collection('dmMessages')
     .orderBy('timestamp')
@@ -204,7 +206,6 @@ function listenUserMessages() {
         const msgDiv = document.createElement('div');
         msgDiv.classList.add('message');
 
-        // badge + penName + message
         const badge = createPenBadge(msg.penName);
         badge.style.float = 'left';
         badge.style.marginRight = '8px';
@@ -214,7 +215,6 @@ function listenUserMessages() {
         textSpan.textContent = `${msg.penName}: ${msg.text}`;
         msgDiv.appendChild(textSpan);
 
-        // Timestamp below message in small light text
         const timeSpan = document.createElement('div');
         timeSpan.style.fontSize = '0.7em';
         timeSpan.style.color = '#999';
@@ -228,7 +228,8 @@ function listenUserMessages() {
     });
 }
 
-// --- Listen to group messages ---
+// --- Listen for group messages ---
+
 function listenGroupMessages() {
   db.collection('groupMessages')
     .orderBy('timestamp')
@@ -240,7 +241,6 @@ function listenGroupMessages() {
         const msgDiv = document.createElement('div');
         msgDiv.classList.add('message');
 
-        // badge + penName + message
         const badge = createPenBadge(msg.penName);
         badge.style.float = 'left';
         badge.style.marginRight = '8px';
@@ -250,7 +250,6 @@ function listenGroupMessages() {
         textSpan.textContent = `${msg.penName}: ${msg.text}`;
         msgDiv.appendChild(textSpan);
 
-        // Timestamp below message in small light text
         const timeSpan = document.createElement('div');
         timeSpan.style.fontSize = '0.7em';
         timeSpan.style.color = '#999';
@@ -265,10 +264,10 @@ function listenGroupMessages() {
 }
 
 // --- Send DM message ---
+
 sendMessageBtn.onclick = () => {
   const text = messageInput.value.trim();
-  if (!text) return;
-  if (!currentUser || !currentPenName) return;
+  if (!text || !currentUser || !currentPenName) return;
 
   db.collection('dmMessages').add({
     uid: currentUser.uid,
@@ -283,19 +282,20 @@ sendMessageBtn.onclick = () => {
 };
 
 // --- Send Group message ---
+
 sendGroupMessageBtn.onclick = () => {
   const text = groupMessageInput.value.trim();
-  if (!text) return;
-  if (!currentUser || !currentPenName) return;
+  if (!text || !currentUser ||
+!currentPenName) return;
 
-  db.collection('groupMessages').add({
-    uid: currentUser.uid,
-    penName: currentPenName,
-    text,
-    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  }).then(() => {
-    groupMessageInput.value = '';
-  }).catch(err => {
-    alert("Failed to send group message: " + err.message);
-  });
+db.collection('groupMessages').add({
+uid: currentUser.uid,
+penName: currentPenName,
+text,
+timestamp: firebase.firestore.FieldValue.serverTimestamp()
+}).then(() => {
+groupMessageInput.value = '';
+}).catch(err => {
+alert("Failed to send group message: " + err.message);
+});
 };
