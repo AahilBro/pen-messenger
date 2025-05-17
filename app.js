@@ -38,7 +38,7 @@ const changePenNameBtn = document.getElementById('changePenNameBtn');
 // Globals
 let currentUser = null;
 let currentPenName = null;
-const SITE_PASSWORD = "1234";  // change to your real password!
+const SITE_PASSWORD = "ink";  // change to your real password!
 
 // --- Helper functions ---
 
