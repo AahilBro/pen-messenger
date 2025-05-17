@@ -34,15 +34,15 @@ let currentUser = null;
 let currentPenName = "";
 const SITE_PASSWORD = "ink"; // Your site password!
 
-// Helper to switch visible screen
+// Switch screen helper
 function showScreen(screen) {
-  [loginSection, penIdSection, chatSection].forEach(sec => sec.classList.remove("active"));
+  [loginSection, penIdSection, chatSection].forEach(s => s.classList.remove("active"));
   screen.classList.add("active");
 }
 
-// Show welcome popup
+// Welcome popup
 function showWelcome(name) {
-  alert(`Welcome! ${name}`);
+  alert(`Welcome, ${name}!`);
 }
 
 // GOOGLE SIGN IN
@@ -59,7 +59,7 @@ googleSignInBtn.onclick = async () => {
 };
 
 // PEN NAME & PASSWORD SUBMIT
-penIdSubmitBtn.onclick = () => {
+penIdSubmitBtn.onclick = async () => {
   const penName = penIdInput.value.trim();
   const password = sitePasswordInput.value;
 
@@ -72,13 +72,22 @@ penIdSubmitBtn.onclick = () => {
     return;
   }
 
-  currentPenName = penName;
   penIdError.textContent = "";
+  currentPenName = penName;
+
+  // Save pen name for this user in Firestore (so they can update/change later)
+  await db.collection("users").doc(currentUser.uid).set({
+    penName: currentPenName,
+    email: currentUser.email,
+    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
   showScreen(chatSection);
+  messageInput.focus();
   listenForMessages();
 };
 
-// LISTEN FOR NEW MESSAGES
+// LISTEN FOR MESSAGES realtime
 function listenForMessages() {
   db.collection("messages")
     .orderBy("timestamp")
@@ -88,7 +97,8 @@ function listenForMessages() {
         const msg = doc.data();
         const time = msg.timestamp ? msg.timestamp.toDate().toLocaleTimeString() : "";
         const div = document.createElement("div");
-        div.textContent = `[${time}] ${msg.penName}: ${msg.message}`;
+        div.classList.add("message");
+        div.innerHTML = `<span class="msg-time">[${time}]</span> <span class="msg-penName">${msg.penName}:</span> <span class="msg-text">${msg.message}</span>`;
         messagesDiv.appendChild(div);
       });
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -121,7 +131,8 @@ changePenNameBtn.onclick = () => {
   messageInput.value = "";
   messagesDiv.innerHTML = "";
   showScreen(penIdSection);
+  penIdInput.focus();
 };
 
-// On page load, show login screen
+// Show login on load
 showScreen(loginSection);
