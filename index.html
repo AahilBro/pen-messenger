@@ -19,9 +19,8 @@
 
   <!-- PEN NAME & PASSWORD SCREEN -->
   <section id="penId-section" class="screen">
-    <h2>Enter Your Pen Name & Site Password</h2>
-    <input id="penIdInput" placeholder="Pen Name" autocomplete="off" />
-    <input id="sitePasswordInput" type="password" placeholder="Site Password" autocomplete="off" />
+    <input id="penIdInput" placeholder="Enter your Pen Name" />
+    <input id="sitePasswordInput" type="password" placeholder="Enter Site Password" />
     <button id="penIdSubmitBtn" class="glow-button">Enter Chat</button>
     <p id="penIdError" class="error-text"></p>
   </section>
@@ -29,23 +28,34 @@
   <!-- CHAT SCREEN -->
   <section id="chat-section" class="screen">
     <div id="chat-container">
-      <aside id="dm-list" class="chat-panel">
+      <div id="dm-list" class="chat-panel">
         <h2>DMs</h2>
-        <div id="messages"></div>
-      </aside>
-
-      <main id="pen-group" class="chat-panel">
-        <h2>Pen Group</h2>
-        <!-- Add group chat or members later -->
-      </main>
+        <div id="dm-messages"></div>
+      </div>
+      <div id="pen-group" class="chat-panel">
+        <h2>Group Chat</h2>
+        <div id="group-messages"></div>
+        <div id="group-message-box">
+          <input id="groupMessageInput" placeholder="Type a group message..." autocomplete="off" />
+          <button id="sendGroupMessageBtn" class="glow-button">Send</button>
+        </div>
+      </div>
+      <div id="members-list" class="chat-panel">
+        <h2>Members</h2>
+        <div id="members"></div>
+      </div>
     </div>
-
     <div id="message-box">
-      <input id="messageInput" placeholder="Type a message..." autocomplete="off" />
+      <input id="messageInput" placeholder="Type a DM message..." autocomplete="off" />
       <button id="sendMessageBtn" class="glow-button">Send</button>
       <button id="changePenNameBtn" class="glow-button small-btn">Change Pen Name</button>
     </div>
   </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
+
 
   <script src="app.js"></script>
 </body>
