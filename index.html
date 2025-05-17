@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pen Messenger</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+  <!-- LOGIN SCREEN -->
+  <section id="login-section" class="active screen">
+    <button id="googleSignInBtn" class="glow-button">Sign in with Google</button>
+  </section>
+
+  <!-- PEN NAME & PASSWORD SCREEN -->
+  <section id="penId-section" class="screen">
+    <input id="penIdInput" placeholder="Enter your Pen Name" />
+    <input id="sitePasswordInput" type="password" placeholder="Enter Site Password" />
+    <button id="penIdSubmitBtn" class="glow-button">Enter Chat</button>
+    <p id="penIdError" class="error-text"></p>
+  </section>
+
+  <!-- CHAT SCREEN -->
+  <section id="chat-section" class="screen">
+    <div id="chat-container">
+      <div id="dm-list" class="chat-panel">
+        <h2>DMs</h2>
+        <div id="messages"></div>
+      </div>
+      <div id="pen-group" class="chat-panel">
+        <h2>Pen Group</h2>
+        <!-- Could add group chat or members here -->
+      </div>
+    </div>
+    <div id="message-box">
+      <input id="messageInput" placeholder="Type a message..." autocomplete="off" />
+      <button id="sendMessageBtn" class="glow-button">Send</button>
+      <button id="changePenNameBtn" class="glow-button small-btn">Change Pen Name</button>
+    </div>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
