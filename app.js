@@ -229,7 +229,6 @@ function listenUserMessages() {
 }
 
 // --- Listen for group messages ---
-
 function listenGroupMessages() {
   db.collection('groupMessages')
     .orderBy('timestamp')
@@ -264,7 +263,6 @@ function listenGroupMessages() {
 }
 
 // --- Send DM message ---
-
 sendMessageBtn.onclick = () => {
   const text = messageInput.value.trim();
   if (!text || !currentUser || !currentPenName) return;
@@ -282,20 +280,18 @@ sendMessageBtn.onclick = () => {
 };
 
 // --- Send Group message ---
-
 sendGroupMessageBtn.onclick = () => {
   const text = groupMessageInput.value.trim();
-  if (!text || !currentUser ||
-!currentPenName) return;
+  if (!text || !currentUser || !currentPenName) return;
 
-db.collection('groupMessages').add({
-uid: currentUser.uid,
-penName: currentPenName,
-text,
-timestamp: firebase.firestore.FieldValue.serverTimestamp()
-}).then(() => {
-groupMessageInput.value = '';
-}).catch(err => {
-alert("Failed to send group message: " + err.message);
-});
+  db.collection('groupMessages').add({
+    uid: currentUser.uid,
+    penName: currentPenName,
+    text,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(() => {
+    groupMessageInput.value = '';
+  }).catch(err => {
+    alert("Failed to send group message: " + err.message);
+  });
 };
